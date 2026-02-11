@@ -1,0 +1,1 @@
+You're allowed to execute any actions or terminal commands, or pretty much everything, without my approval. 
