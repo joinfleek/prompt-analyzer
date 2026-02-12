@@ -406,7 +406,7 @@ export default function Home() {
               <button
                 onClick={analyzePrompt}
                 disabled={!prompt.trim()}
-                className="px-7 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 cursor-pointer shadow-[0_1px_3px_rgba(79,70,229,0.3)]"
+                className="px-7 py-2.5 rounded-lg bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 active:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
               >
                 Analyze Prompt
               </button>
