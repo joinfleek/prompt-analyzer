@@ -235,6 +235,66 @@ function StreamingProgress({ phase }: { phase: string }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Skeletons                                                          */
+/* ------------------------------------------------------------------ */
+function ScoreSkeleton() {
+  return (
+    <div className="flex flex-col items-center gap-3 animate-fade-in">
+      <div className="w-[180px] h-[180px] rounded-full skeleton" />
+      <div className="w-20 h-4 skeleton" />
+    </div>
+  );
+}
+
+function RuleCardSkeleton({ index }: { index: number }) {
+  return (
+    <div className="animate-fade-in-up" style={{ animationDelay: `${index * 60}ms` }}>
+      <div className="flex items-start gap-4 p-5 rounded-xl bg-white border border-gray-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="flex-shrink-0 w-8 h-8 rounded-lg skeleton" />
+        <div className="flex-1 space-y-2.5">
+          <div className="flex items-center gap-3">
+            <div className="w-28 h-4 skeleton" />
+            <div className="w-14 h-3 skeleton" />
+          </div>
+          <div className="w-48 h-3 skeleton" />
+          <div className="w-full h-3 skeleton" />
+          <div className="w-3/4 h-3 skeleton" />
+          <div className="mt-3 w-full h-12 rounded-lg skeleton" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ImprovedPromptSkeleton() {
+  return (
+    <div className="animate-fade-in">
+      <div className="flex items-end justify-between mb-5">
+        <div className="space-y-2">
+          <div className="w-40 h-5 skeleton" />
+          <div className="w-56 h-3 skeleton" />
+        </div>
+        <div className="w-28 h-8 rounded-lg skeleton" />
+      </div>
+      <div className="relative">
+        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-gray-200" />
+        <div className="p-5 pl-6 rounded-xl bg-white border border-gray-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] space-y-3">
+          <div className="w-full h-3.5 skeleton" />
+          <div className="w-full h-3.5 skeleton" />
+          <div className="w-11/12 h-3.5 skeleton" />
+          <div className="w-full h-3.5 skeleton" />
+          <div className="w-4/5 h-3.5 skeleton" />
+          <div className="w-full h-3.5 skeleton" />
+          <div className="w-3/4 h-3.5 skeleton" />
+          <div className="w-full h-3.5 skeleton" />
+          <div className="w-5/6 h-3.5 skeleton" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Copy Button                                                        */
 /* ------------------------------------------------------------------ */
 function CopyButton({ text }: { text: string }) {
@@ -469,6 +529,10 @@ export default function Home() {
               <div className="flex items-center gap-6 flex-shrink-0">
                 <ScoreRing score={result!.score!} />
               </div>
+            ) : streaming ? (
+              <div className="flex-shrink-0">
+                <ScoreSkeleton />
+              </div>
             ) : (
               <StreamingProgress phase={phase} />
             )}
@@ -510,7 +574,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* ---- Left Column: Rules + Recommendations (combined) ---- */}
             <div className="space-y-6">
-              {hasRules && (
+              {hasRules ? (
                 <div className="animate-fade-in">
                   <SectionHeader
                     title="The 5 Rules"
@@ -520,6 +584,24 @@ export default function Home() {
                     {result!.rules!.map((rule, i) => (
                       <RuleCard key={rule.rule} rule={rule} index={i} />
                     ))}
+                    {/* Show remaining skeleton cards while still streaming */}
+                    {streaming && result!.rules!.length < 5 &&
+                      Array.from({ length: 5 - result!.rules!.length }).map((_, i) => (
+                        <RuleCardSkeleton key={`skel-${i}`} index={result!.rules!.length + i} />
+                      ))
+                    }
+                  </div>
+                </div>
+              ) : streaming && (
+                <div className="animate-fade-in">
+                  <SectionHeader
+                    title="The 5 Rules"
+                    subtitle="Assessment & recommendation for each rule"
+                  />
+                  <div className="space-y-2.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <RuleCardSkeleton key={`skel-${i}`} index={i} />
+                    ))}
                   </div>
                 </div>
               )}
@@ -527,7 +609,7 @@ export default function Home() {
 
             {/* ---- Right Column: Improved Prompt ---- */}
             <div className="space-y-6">
-              {hasImproved && (
+              {hasImproved ? (
                 <div className="animate-fade-in">
                   <div className="flex items-end justify-between mb-5">
                     <div>
@@ -543,6 +625,8 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              ) : streaming && (
+                <ImprovedPromptSkeleton />
               )}
             </div>
           </div>
