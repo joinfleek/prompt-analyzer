@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { diffWords } from "diff";
 
 interface RuleResult {
@@ -231,6 +231,45 @@ function StreamingProgress({ phase }: { phase: string }) {
       </div>
       <p className="text-base text-gray-400 font-medium">{phase}</p>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Copy Button                                                        */
+/* ------------------------------------------------------------------ */
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 transition-all duration-150 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+    >
+      {copied ? (
+        <>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8.5L6.5 12L13 4" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-green-600">Copied!</span>
+        </>
+      ) : (
+        <>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M3 11V3.5C3 2.67 3.67 2 4.5 2H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Copy Prompt
+        </>
+      )}
+    </button>
   );
 }
 
@@ -490,10 +529,13 @@ export default function Home() {
             <div className="space-y-6">
               {hasImproved && (
                 <div className="animate-fade-in">
-                  <SectionHeader
-                    title="Improved Prompt"
-                    subtitle="Green = added, strikethrough = removed"
-                  />
+                  <div className="flex items-end justify-between mb-5">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 tracking-[-0.02em]">Improved Prompt</h2>
+                      <p className="text-sm text-gray-400 mt-1">Green = added, strikethrough = removed</p>
+                    </div>
+                    <CopyButton text={result!.improvedPrompt!} />
+                  </div>
                   <div className="relative">
                     <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-indigo-500" />
                     <div className="p-5 pl-6 rounded-xl bg-white border border-gray-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
